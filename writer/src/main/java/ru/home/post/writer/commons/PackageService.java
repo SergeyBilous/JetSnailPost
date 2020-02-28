@@ -103,6 +103,7 @@ public class PackageService {
     public RoutePoint getCurrentPoint(Package aPackage) {
         String query = getStatusQuery();
         query += " where d.package_ref=" + String.valueOf(aPackage.getId());
+        query+=" and dates.package_ref=" + String.valueOf(aPackage.getId());
         try (Statement st = carrierInfo.getConnection().createStatement();
              ResultSet rs = st.executeQuery(query)) {
             if (!rs.next())
