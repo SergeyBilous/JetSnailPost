@@ -1,10 +1,11 @@
 package ru.home.post.writer.commons;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class RoutePointsService {
     private CarrierInfo carrierInfo;
@@ -74,8 +75,8 @@ public class RoutePointsService {
             nextPointQuery+=excludePreviousPoints;
             try(Statement nextPointsSt=carrierInfo.getConnection().createStatement();
             ResultSet nextPointRs=nextPointsSt.executeQuery(nextPointQuery)){
-                rs.next();
-                Long pointId=rs.getLong(1);
+                nextPointRs.next();
+                Long pointId=nextPointRs.getLong(3);
                 nextPoint= getRoutePoint(pointId);
             }
         } catch (SQLException e) {
