@@ -100,13 +100,28 @@ public class PackageService {
         return null;
     }
 
+    public RoutePoint getCurrentPoint(Package aPackage) {
+        String query = getStatusQuery();
+        query += " where d.package_ref=" + String.valueOf(aPackage.getId());
+        try (Statement st = carrierInfo.getConnection().createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+            if (!rs.next())
+                return null;
+            Long pointId = rs.getLong(1);
+            return carrierInfo.getRoutePointsService().getRoutePoint(pointId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Package> packagesInStatus(Status status) {
         List<Package> packages = new ArrayList<>();
         String queryStatus = getStatusQuery();
         queryStatus += " where d.status_ref =" + String.valueOf(status.label);
         String query = "select * from " + carrierInfo.getUser() + ".PACKAGES p where p.id in ( select q.package_ref from (" +
                 queryStatus + ") q)";
-        packages=executeQuery(query);
+        packages = executeQuery(query);
         return packages;
     }
 
@@ -115,11 +130,11 @@ public class PackageService {
 
         String queryStatus = getStatusQuery();
         queryStatus += " where d.status_ref =" + String.valueOf(status.label);
-        SimpleDateFormat df=new SimpleDateFormat("dd-MM-yyyy");
-        queryStatus+=" and d.operation_date<to_date('"+df.format(beforeDate)+"','DD-MM-YYYY')";
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        queryStatus += " and d.operation_date<to_date('" + df.format(beforeDate) + "','DD-MM-YYYY')";
         String query = "select * from " + carrierInfo.getUser() + ".PACKAGES p where p.id in ( select q.package_ref from (" +
                 queryStatus + ") q)";
-        packages=executeQuery(query);
+        packages = executeQuery(query);
         return packages;
     }
 

@@ -1,10 +1,9 @@
 package ru.home.post.writer;
 
-import ru.home.post.writer.commons.*;
 import ru.home.post.writer.commons.Package;
+import ru.home.post.writer.commons.*;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public class CreateMoves implements Runnable {
     private CarrierInfo carrierInfo;
@@ -78,8 +77,13 @@ public class CreateMoves implements Runnable {
                 finalStatus = toStatus;
             }
             packageService.setState(date, aPackage, finalStatus, nextPoint);
-        } else
-            packageService.setState(date, aPackage, toStatus, nextPoint);
+        } else {
+            if (toStatus.equals(Status.EN_ROUTE)) {
+                RoutePoint currentPoint=packageService.getCurrentPoint(aPackage);
+                packageService.setState(date, aPackage, toStatus, currentPoint);
+            } else
+                packageService.setState(date, aPackage, toStatus, nextPoint);
+        }
     }
 
     private Package nextPackage(List<Package> ready, Set<Long> processed) {
