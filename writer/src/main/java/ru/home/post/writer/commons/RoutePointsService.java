@@ -64,13 +64,13 @@ public class RoutePointsService {
             while (rs.next()) {
                 points.add(rs.getLong(1));
             }
-            String nextPointQuery="select * from "+carrierInfo.getUser()+".PLANNED_ROUTES where package_ref="+String.valueOf(packageId);
+            String nextPointQuery="select * from "+carrierInfo.getUser()+".PLANNDED_ROUTES where package_ref="+String.valueOf(packageId);
             String excludePreviousPoints=" and point_ref not in (";
             for(Long point:points){
                 excludePreviousPoints+=String.valueOf(point)+",";
             }
-            excludePreviousPoints=excludePreviousPoints.substring(0,excludePreviousPoints.length())+")";
-            excludePreviousPoints+=" and rownum=1 order by point_number asc";
+            excludePreviousPoints=excludePreviousPoints.substring(0,excludePreviousPoints.length()-1)+")";
+            excludePreviousPoints+="  order by point_number asc";
             nextPointQuery+=excludePreviousPoints;
             try(Statement nextPointsSt=carrierInfo.getConnection().createStatement();
             ResultSet nextPointRs=nextPointsSt.executeQuery(nextPointQuery)){

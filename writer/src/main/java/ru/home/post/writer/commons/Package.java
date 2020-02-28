@@ -8,6 +8,11 @@ public class Package {
     private RoutePoint startPoint;
     private RoutePoint endPoint;
 
+    public Package() {
+        startPoint = new RoutePoint();
+        endPoint = new RoutePoint();
+    }
+
     public Long getId() {
         return id;
     }
