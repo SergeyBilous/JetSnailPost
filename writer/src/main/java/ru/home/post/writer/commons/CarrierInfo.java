@@ -24,7 +24,7 @@ public class CarrierInfo {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            String url="jdbc:oracle:thin@hadoop.home.ru:1521/"+dbname;
+            String url="jdbc:oracle:thin:@hadoop.home.ru:1521:"+dbname;
             try {
                 con= DriverManager.getConnection(url,this.user,this.password);
             } catch (SQLException e) {

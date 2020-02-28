@@ -5,15 +5,23 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class RoutePoint {
     private Long id;
-    private Long name;
+    private String name;
     public RoutePoint(){}
 
     public Long getId() {
         return id;
     }
 
-    public Long getName() {
+    public String getName() {
         return name;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

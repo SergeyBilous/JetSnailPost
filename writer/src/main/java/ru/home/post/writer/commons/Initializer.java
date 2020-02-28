@@ -18,7 +18,8 @@ public class Initializer {
     }
 
     public Boolean truncateTables() {
-        String[] tablesToTruncate = {"DELIVERY_POINTS", "DELIVERY_STATUS", "PACKAGES", "PLANNDED_ROUTES", "STATUSES"};
+        String[] tablesToTruncate = {"DELIVERY_POINTS", "DELIVERY_STATUS", "PACKAGES", "PLANNDED_ROUTES",
+                "STATUSES","TIMESETTINGS"};
         try (Statement st = carrierInfo.getConnection().createStatement()) {
             for (String tableName : tablesToTruncate) {
                 String queryText = "truncate table " + carrierInfo.getUser() + "." + tableName;
@@ -51,7 +52,7 @@ public class Initializer {
     }
 
     public static void main(String[] args) {
-        CarrierInfo carrierInfo = new CarrierInfo("hadoop.home.ru", "logistic1", "carrier", "welcome1");
+        CarrierInfo carrierInfo = new CarrierInfo("hadoop.home.ru", "logistic1", "CARRIER", "welcome1");
         Initializer initializer = new Initializer(carrierInfo);
         ClassLoader classLoader = initializer.getClass().getClassLoader();
 
