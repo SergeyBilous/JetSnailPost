@@ -13,9 +13,10 @@ public class DateService {
     private CarrierInfo carrierInfo;
     private Date date;
     private Integer iteration;
+    private Date initialDate;
 
     public DateService(CarrierInfo carrierInfo) {
-        this.carrierInfo=carrierInfo;
+        this.carrierInfo = carrierInfo;
         String query = "select * from " + carrierInfo.getUser() + ".TIMESETTINGS "; // В этой таблице всегда 1 запись
         try (Statement st = carrierInfo.getConnection().createStatement();
              ResultSet rs = st.executeQuery(query)) {
@@ -23,6 +24,7 @@ public class DateService {
                 insertRow();
             } else {
                 date = rs.getDate(1);
+                initialDate = new Date(date.getTime());
                 iteration = rs.getInt(2);
             }
 
@@ -47,11 +49,26 @@ public class DateService {
         }
     }
 
-    public Date getDate() {
+    public java.util.Date getDate() {
         return date;
     }
 
+    public java.util.Date getDate(int dayNo) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(initialDate);
+        c.add(Calendar.DAY_OF_MONTH, dayNo);
+        return c.getTime();
+    }
+
     public Integer getIteration() {
+        String query="select * from "+carrierInfo.getUser()+".TIMESETTINGS";
+        try(Statement st=carrierInfo.getConnection().createStatement();
+        ResultSet rs=st.executeQuery(query)){
+            rs.next();  //
+            return rs.getInt(2);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return iteration;
     }
 
@@ -65,6 +82,7 @@ public class DateService {
             insertSt.setInt(2, 0);
             insertSt.executeUpdate();
             date = startDate;
+            initialDate = new Date(date.getTime());
             iteration = 0;
         } catch (SQLException e) {
             e.printStackTrace();

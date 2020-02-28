@@ -20,12 +20,10 @@ public class CreatePackages implements Runnable {
 
     @Override
     public void run() {
-        DateService dateService=new DateService(carrierInfo);
-        RoutePointsService routePointsService=new RoutePointsService(carrierInfo);
-        PackageService packageService=new PackageService(carrierInfo);
-        carrierInfo.setDateService(dateService);
-        carrierInfo.setPackageService(packageService);
-        carrierInfo.setRoutePointsService(routePointsService);
+        DateService dateService=carrierInfo.getDateService();
+        RoutePointsService routePointsService=carrierInfo.getRoutePointsService();
+        PackageService packageService=carrierInfo.getPackageService();
+
         for (int dayCounter = 0; dayCounter < days; dayCounter++) {
             Integer delta = WriterSettings.getPackagesPerDay() * WriterSettings.getDelta() / 100;
             Integer minPackages = WriterSettings.getPackagesPerDay() - delta;

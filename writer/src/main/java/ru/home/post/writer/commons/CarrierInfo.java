@@ -7,9 +7,10 @@ import java.sql.SQLException;
 public class CarrierInfo {
     private String host, dbname, user, password;
     private Connection con = null;
-private PackageService packageService;
-private RoutePointsService routePointsService;
-private DateService dateService;
+    private PackageService packageService;
+    private RoutePointsService routePointsService;
+    private DateService dateService;
+
     public CarrierInfo(String host, String dbname, String user, String password) {
         this.host = host;
         this.dbname = dbname;
@@ -50,9 +51,9 @@ private DateService dateService;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            String url="jdbc:oracle:thin:@hadoop.home.ru:1521:"+dbname;
+            String url = "jdbc:oracle:thin:@hadoop.home.ru:1521:" + dbname;
             try {
-                con= DriverManager.getConnection(url,this.user,this.password);
+                con = DriverManager.getConnection(url, this.user, this.password);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

@@ -1,6 +1,7 @@
 package ru.home.post.writer.commons;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,8 +110,16 @@ public class PackageService {
         return packages;
     }
 
-    public List<Package> packagesInStatus(Status status, Date beforeDate) {
+    public List<Package> packagesInStatus(Status status, java.util.Date beforeDate) {
         List<Package> packages = new ArrayList<>();
+
+        String queryStatus = getStatusQuery();
+        queryStatus += " where d.status_ref =" + String.valueOf(status.label);
+        SimpleDateFormat df=new SimpleDateFormat("dd-MM-yyyy");
+        queryStatus+=" and d.operation_date<to_date('"+df.format(beforeDate)+"','DD-MM-YYYY')";
+        String query = "select * from " + carrierInfo.getUser() + ".PACKAGES p where p.id in ( select q.package_ref from (" +
+                queryStatus + ") q)";
+        packages=executeQuery(query);
         return packages;
     }
 
@@ -133,10 +142,11 @@ public class PackageService {
         return packages;
     }
 
-    private String getStatusQuery() {
+    public String getStatusQuery() {
         String query = "select d.* from " + carrierInfo.getUser() + ".delivery_status d left join( \n" +
                 "select package_ref,MAX(operation_date) as max_date from " + carrierInfo.getUser() + ".delivery_status\n" +
                 "group by package_ref) dates on dates.max_date=d.operation_date\n";
         return query;
     }
+
 }

@@ -21,6 +21,7 @@ public class RoutePointsService {
         Integer id = r.nextInt(maxId) + 1;
         return getRoutePoint(Long.valueOf(id));
     }
+
     public RoutePoint getRoutePoint(Long id) {
         String query = "select * from " + carrierInfo.getUser() + ".DELIVERY_POINTS where id=" + String.valueOf(id);
         try (Statement st = carrierInfo.getConnection().createStatement();
@@ -39,7 +40,7 @@ public class RoutePointsService {
     public List<RoutePoint> createRoute() {
         Random r = new Random();
         List<Long> points = new ArrayList<>();
-        List<RoutePoint> route=new ArrayList<>();
+        List<RoutePoint> route = new ArrayList<>();
         Integer numOfPoints = r.nextInt((WriterSettings.getMaximumRouteLength() -
                 WriterSettings.getMinimumRouteLength()) + 1) + WriterSettings.getMinimumRouteLength();
         while (points.size() <= numOfPoints) {
@@ -50,7 +51,36 @@ public class RoutePointsService {
             route.add(getRoutePoint(pointId));
         }
 
-        return  route;
+        return route;
     }
 
+    public RoutePoint nextPoint(Package aPackage) {
+        Long packageId = aPackage.getId();
+        List<Long> points = new ArrayList<>();
+        RoutePoint nextPoint = new RoutePoint();
+        String pointsQuery = "select point_ref from " + carrierInfo.getUser() + ".DELIVERY_STATUS where PACKAGE_REF=" + String.valueOf(packageId);
+        try (Statement st = carrierInfo.getConnection().createStatement();
+             ResultSet rs = st.executeQuery(pointsQuery)) {
+            while (rs.next()) {
+                points.add(rs.getLong(1));
+            }
+            String nextPointQuery="select * from "+carrierInfo.getUser()+".PLANNED_ROUTES where package_ref="+String.valueOf(packageId);
+            String excludePreviousPoints=" and point_ref not in (";
+            for(Long point:points){
+                excludePreviousPoints+=String.valueOf(point)+",";
+            }
+            excludePreviousPoints=excludePreviousPoints.substring(0,excludePreviousPoints.length())+")";
+            excludePreviousPoints+=" and rownum=1 order by point_number asc";
+            nextPointQuery+=excludePreviousPoints;
+            try(Statement nextPointsSt=carrierInfo.getConnection().createStatement();
+            ResultSet nextPointRs=nextPointsSt.executeQuery(nextPointQuery)){
+                rs.next();
+                Long pointId=rs.getLong(1);
+                nextPoint= getRoutePoint(pointId);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return nextPoint;
+    }
 }
