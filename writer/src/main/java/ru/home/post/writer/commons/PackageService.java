@@ -108,7 +108,7 @@ public class PackageService {
              ResultSet rs = st.executeQuery(query)) {
             if (!rs.next())
                 return null;
-            Long pointId = rs.getLong(1);
+            Long pointId = rs.getLong(3);
             return carrierInfo.getRoutePointsService().getRoutePoint(pointId);
         } catch (SQLException e) {
             e.printStackTrace();
