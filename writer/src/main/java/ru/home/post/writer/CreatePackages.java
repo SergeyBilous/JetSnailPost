@@ -23,13 +23,18 @@ public class CreatePackages implements Runnable {
         DateService dateService=new DateService(carrierInfo);
         RoutePointsService routePointsService=new RoutePointsService(carrierInfo);
         PackageService packageService=new PackageService(carrierInfo);
+        carrierInfo.setDateService(dateService);
+        carrierInfo.setPackageService(packageService);
+        carrierInfo.setRoutePointsService(routePointsService);
         for (int dayCounter = 0; dayCounter < days; dayCounter++) {
-            Integer delta = WriterSettings.getPackagesPerDay() * WriterSettings.getDelta() * 100;
+            Integer delta = WriterSettings.getPackagesPerDay() * WriterSettings.getDelta() / 100;
             Integer minPackages = WriterSettings.getPackagesPerDay() - delta;
             Integer maxPackages = WriterSettings.getPackagesPerDay() + delta;
             Random r = new Random();
-            Integer packagesQuantity = r.nextInt((maxPackages - minPackages) + 1) + minPackages;
+            Integer bound=(maxPackages - minPackages) + 1;
+            Integer packagesQuantity = r.nextInt(bound) + minPackages;
             Date workingDate=dateService.getDate();
+            System.out.println(carrierInfo.getDbname()+" packages "+workingDate+" "+packagesQuantity+" "+new Date());
             for (int i = 0; i < packagesQuantity; i++) {
                 Package aPackage = new Package();
                 List<RoutePoint> route=routePointsService.createRoute();
@@ -38,7 +43,8 @@ public class CreatePackages implements Runnable {
                 aPackage.setEndPoint(route.get(route.size()-1));
                 packageService.savePackage(aPackage);
                 packageService.saveRoute(aPackage,route);
-                System.out.println(carrierInfo.getUser()+" "+workingDate+" "+aPackage.getId());
+                packageService.setState(workingDate,aPackage,Status.ACCEPTED,route.get(0));
+
             }
             dateService.newDate();
 

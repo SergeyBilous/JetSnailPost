@@ -7,7 +7,9 @@ import java.sql.SQLException;
 public class CarrierInfo {
     private String host, dbname, user, password;
     private Connection con = null;
-
+private PackageService packageService;
+private RoutePointsService routePointsService;
+private DateService dateService;
     public CarrierInfo(String host, String dbname, String user, String password) {
         this.host = host;
         this.dbname = dbname;
@@ -15,6 +17,30 @@ public class CarrierInfo {
 
         this.password = password;
 
+    }
+
+    public PackageService getPackageService() {
+        return packageService;
+    }
+
+    public void setPackageService(PackageService packageService) {
+        this.packageService = packageService;
+    }
+
+    public RoutePointsService getRoutePointsService() {
+        return routePointsService;
+    }
+
+    public void setRoutePointsService(RoutePointsService routePointsService) {
+        this.routePointsService = routePointsService;
+    }
+
+    public DateService getDateService() {
+        return dateService;
+    }
+
+    public void setDateService(DateService dateService) {
+        this.dateService = dateService;
     }
 
     public Connection getConnection() {
@@ -32,6 +58,10 @@ public class CarrierInfo {
             }
         }
         return con;
+    }
+
+    public String getDbname() {
+        return dbname;
     }
 
     public String getUser() {

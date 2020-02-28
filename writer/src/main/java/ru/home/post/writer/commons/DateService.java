@@ -35,7 +35,7 @@ public class DateService {
         iteration++;
         Calendar c = Calendar.getInstance();
         c.setTime(date);
-        c.add(Calendar.DAY_OF_MONTH, iteration);
+        c.add(Calendar.DAY_OF_MONTH, 1);
         date = c.getTime();
         String updateQuery = "update " + carrierInfo.getUser() + ".TIMESETTINGS set ITERATION_NUMBER=? where 1=1";
         try (PreparedStatement st = carrierInfo.getConnection().prepareStatement(updateQuery)) {
