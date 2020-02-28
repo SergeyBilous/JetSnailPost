@@ -54,12 +54,16 @@ public class CreateMoves implements Runnable {
             }
             counter = r.nextInt(WriterSettings.getMovesPerDay());
             for (int i = 0; i < counter; i++) {
+                if(toGround.size()<=0)
+                    break;
                 Package currentPackage = nextPackage(toGround, packagesProcessed);
                 createMove(curDate, currentPackage, Status.WAITING_FOR_TRANSPORT);
                 System.out.println("En route->Waiting or done :" + currentPackage.getId());
             }
             counter = r.nextInt(WriterSettings.getMovesPerDay());
             for (int i = 0; i < counter; i++) {
+                if(toMove.size()<=0)
+                    break;
                 Package currentPackage = nextPackage(toMove, packagesProcessed);
                 createMove(curDate, currentPackage, Status.EN_ROUTE);
                 System.out.println("Waiting -> En route  :" + currentPackage.getId());
