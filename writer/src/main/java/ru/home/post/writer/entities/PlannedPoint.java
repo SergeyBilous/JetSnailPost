@@ -6,6 +6,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 @Entity
 @Table(name = "PLANNED_ROUTES")
 public class PlannedPoint implements Comparable<PlannedPoint>{
+    @Id
     @SequenceGenerator(name = "planned_routes_generator", sequenceName = "PLANNED_ROUTES_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "package_generator")
     @Column(name = "ID")

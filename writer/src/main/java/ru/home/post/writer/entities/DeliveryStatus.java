@@ -6,6 +6,7 @@ import java.util.Date;
 @Entity
 @Table(name="DELIVERY_STATUS",schema = "carrier")
 public class DeliveryStatus {
+    @Id
     @SequenceGenerator(name="delivery_status_generator",sequenceName = "DELIVERY_STATUS_SEQ",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "package_generator")
     @Column(name = "ID")
