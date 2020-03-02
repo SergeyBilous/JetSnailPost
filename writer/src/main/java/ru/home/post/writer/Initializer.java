@@ -1,4 +1,6 @@
-package ru.home.post.writer.commons;
+package ru.home.post.writer;
+
+import ru.home.post.writer.commons.CarrierInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,10 +20,11 @@ public class Initializer {
     }
 
     public Boolean truncateTables() {
-        String[] tablesToTruncate = {"DELIVERY_POINTS", "DELIVERY_STATUS", "PACKAGES", "PLANNDED_ROUTES",
+        String[] tablesToTruncate = {"DELIVERY_POINTS", "DELIVERY_STATUS", "PACKAGES", "PLANNED_ROUTES",
                 "STATUSES","TIMESETTINGS"};
         try (Statement st = carrierInfo.getConnection().createStatement()) {
             for (String tableName : tablesToTruncate) {
+                System.out.println("Truncating "+tableName);
                 String queryText = "truncate table " + carrierInfo.getUser() + "." + tableName;
                 st.executeUpdate(queryText);
             }

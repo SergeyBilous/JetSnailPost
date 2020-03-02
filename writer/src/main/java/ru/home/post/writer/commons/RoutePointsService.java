@@ -59,7 +59,7 @@ public class RoutePointsService {
         Long packageId = aPackage.getId();
         List<Long> points = new ArrayList<>();
         RoutePoint nextPoint = new RoutePoint();
-        String pointsQuery = "select point_ref from " + carrierInfo.getUser() + ".DELIVERY_STATUS where PACKAGE_REF=" + String.valueOf(packageId);
+        String pointsQuery = "select distinct point_ref from " + carrierInfo.getUser() + ".DELIVERY_STATUS where PACKAGE_REF=" + String.valueOf(packageId);
         try (Statement st = carrierInfo.getConnection().createStatement();
              ResultSet rs = st.executeQuery(pointsQuery)) {
             while (rs.next()) {
