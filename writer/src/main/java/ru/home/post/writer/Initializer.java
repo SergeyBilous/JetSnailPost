@@ -1,6 +1,7 @@
 package ru.home.post.writer;
 
-import ru.home.post.writer.commons.CarrierInfo;
+
+import ru.home.post.writer.config.CarrierInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +11,7 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 public class Initializer {
-    CarrierInfo carrierInfo;
+    private CarrierInfo carrierInfo;
 
     public Initializer() {
     }
@@ -21,10 +22,10 @@ public class Initializer {
 
     public Boolean truncateTables() {
         String[] tablesToTruncate = {"DELIVERY_POINTS", "DELIVERY_STATUS", "PACKAGES", "PLANNED_ROUTES",
-                "STATUSES","TIMESETTINGS"};
+                "STATUSES", "TIMESETTINGS"};
         try (Statement st = carrierInfo.getConnection().createStatement()) {
             for (String tableName : tablesToTruncate) {
-                System.out.println("Truncating "+tableName);
+                System.out.println("Truncating " + tableName);
                 String queryText = "truncate table " + carrierInfo.getUser() + "." + tableName;
                 st.executeUpdate(queryText);
             }
@@ -47,7 +48,7 @@ public class Initializer {
                 st.executeUpdate();
 
             }
-        } catch (FileNotFoundException | SQLException |NullPointerException e) {
+        } catch (FileNotFoundException | SQLException | NullPointerException e) {
             e.printStackTrace();
             return false;
         }
@@ -64,7 +65,7 @@ public class Initializer {
             if (!initializer.loadData("DELIVERY_POINTS", pointsFile))
                 return;
             File statusFile = new File(classLoader.getResource("statuses.csv").getFile());
-            initializer.loadData("STATUSES",statusFile);
+            initializer.loadData("STATUSES", statusFile);
         }
     }
 }

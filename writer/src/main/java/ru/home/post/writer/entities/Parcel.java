@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 import java.util.TreeSet;
 
 @Entity
@@ -26,7 +27,7 @@ public class Parcel {
     private DeliveryPoint endPoint;
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "PACKAGE_REF")
-    private TreeSet<PlannedPoint> routePlan;
+    private List<PlannedPoint> routePlan;
 
     public Parcel() {
     }
@@ -63,11 +64,11 @@ public class Parcel {
         this.endPoint = endPoint;
     }
 
-    public TreeSet<PlannedPoint> getRoutePlan() {
+    public List<PlannedPoint> getRoutePlan() {
         return routePlan;
     }
 
-    public void setRoutePlan(TreeSet<PlannedPoint> routePlan) {
+    public void setRoutePlan(List<PlannedPoint> routePlan) {
         this.routePlan = routePlan;
     }
 
