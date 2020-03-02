@@ -1,4 +1,4 @@
-package ru.home.post.writer.entties;
+package ru.home.post.writer.entities;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

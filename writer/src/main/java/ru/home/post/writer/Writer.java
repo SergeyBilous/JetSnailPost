@@ -1,21 +1,21 @@
 package ru.home.post.writer;
 
-import ru.home.post.writer.CreatePackages;
-import ru.home.post.writer.commons.CarrierInfo;
-import ru.home.post.writer.commons.DateService;
-import ru.home.post.writer.commons.PackageService;
-import ru.home.post.writer.commons.RoutePointsService;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
-public class Writer {
+@SpringBootApplication
+@ComponentScan(basePackages = "ru.home.post.writer")
+public class Writer implements CommandLineRunner {
     public static void main(String[] args) {
-        CarrierInfo carrierInfo = new CarrierInfo("hadoop.home.ru", "logistic1", "carrier", "welcome1");
-        carrierInfo.setDateService(new DateService(carrierInfo));
-        carrierInfo.setPackageService(new PackageService(carrierInfo));
-        carrierInfo.setRoutePointsService(new RoutePointsService(carrierInfo));
-        CreatePackages packagesCreator = new CreatePackages(carrierInfo, 10);
+        SpringApplication.run(Writer.class, args);
+    }
 
-        Thread writerThread = new Thread(packagesCreator);
-        writerThread.start();
-
+    @Override
+    public void run(String... args) throws Exception {
+        CreatePackages parcelCreator = new CreatePackages(30);
+        Thread parcelCreatorThread = new Thread(parcelCreator);
+        parcelCreatorThread.start();
     }
 }

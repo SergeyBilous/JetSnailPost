@@ -1,4 +1,4 @@
-package ru.home.post.writer.entties;
+package ru.home.post.writer.entities;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,7 +14,7 @@ public class DeliveryStatus {
     private Date operationDate;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PACKAGE_REF")
-    private Package aPackage;
+    private Parcel parcel;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "POINT_REF")
     private DeliveryPoint deliveryPoint;
