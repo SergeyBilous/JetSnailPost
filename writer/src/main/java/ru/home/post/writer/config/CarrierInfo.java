@@ -23,7 +23,7 @@ public class CarrierInfo {
         this.password = password;
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            connection= DriverManager.getConnection("jdnc:oracle:thin:@"+host+":1521:"+dbName,user,password);
+            connection= DriverManager.getConnection("jdbc:oracle:thin:@"+host+":1521:"+dbName,user,password);
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

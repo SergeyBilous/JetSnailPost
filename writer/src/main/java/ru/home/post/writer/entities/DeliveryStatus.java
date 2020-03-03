@@ -8,7 +8,7 @@ import java.util.Date;
 public class DeliveryStatus {
     @Id
     @SequenceGenerator(name="delivery_status_generator",sequenceName = "DELIVERY_STATUS_SEQ",allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "package_generator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "delivery_status_generator")
     @Column(name = "ID")
     private Long id;
     @Temporal(TemporalType.TIMESTAMP)

@@ -19,13 +19,13 @@ public class Parcel {
     @Column(name = "ACCEPTANCE_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date acceptanceDate;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "START_POINT")
     private DeliveryPoint startPoint;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "END_POINT")
     private DeliveryPoint endPoint;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "PACKAGE_REF")
     private List<PlannedPoint> routePlan;
 
