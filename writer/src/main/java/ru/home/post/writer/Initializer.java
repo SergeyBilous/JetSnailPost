@@ -33,6 +33,12 @@ public class Initializer {
             e.printStackTrace();
             return false;
         }
+        try(Statement st=carrierInfo.getConnection().createStatement()){
+            String addTime="insert into "+carrierInfo.getUser()+".TIMESETTINGS (ID,START_TIME,ITERATION_NUMBER)values (1,null,null)";
+            st.executeUpdate(addTime);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return true;
 
     }

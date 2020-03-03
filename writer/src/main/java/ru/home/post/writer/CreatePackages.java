@@ -1,12 +1,12 @@
 package ru.home.post.writer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import ru.home.post.writer.config.Commons;
-import ru.home.post.writer.entities.DeliveryPoint;
-import ru.home.post.writer.entities.Parcel;
-import ru.home.post.writer.entities.PlannedPoint;
+import ru.home.post.writer.entities.*;
 import ru.home.post.writer.repositories.DeliveryPointRepository;
 import ru.home.post.writer.repositories.PackageRepository;
+import ru.home.post.writer.repositories.TimeSettingsRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,17 +20,38 @@ public class CreatePackages implements Runnable {
     private PackageRepository packageRepository;
     @Autowired
     private DeliveryPointRepository deliveryPointRepository;
+    @Autowired
+    private TimeSettingsRepository timeSettingsRepository;
+    @Autowired
+    Environment environment;
 
+private String sPackagesPerDay;
     public CreatePackages(Integer days) {
         this.days = days;
     }
 
     @Override
     public void run() {
-        Parcel parcel = new Parcel();
-        parcel.setAcceptanceDate(new Date());
-        generatePlan(parcel);
-        packageRepository.save(parcel);
+
+        sPackagesPerDay=environment.getProperty("newpackages.per.day");
+        Optional<TimeSettings> timeSettings = timeSettingsRepository.findById(1L);
+        timeSettings.get().setDate(new Date());
+        timeSettings.get().setIterationNumber(0L);
+        timeSettingsRepository.save(timeSettings.get());
+        for (int iterationNumber = 0; iterationNumber < days; iterationNumber++) {
+            Parcel parcel = new Parcel();
+            parcel.setAcceptanceDate(new Date());
+            generatePlan(parcel);
+            List<DeliveryStatus> startStatus = new ArrayList<>();
+            DeliveryStatus status0 = new DeliveryStatus();
+            status0.setOperationDate(new Date());
+            status0.setStatus(new Statuses());
+            status0.getStatus().setId(ParcelStatus.ACCEPTED.label);
+            status0.setDeliveryPoint(parcel.getStartPoint());
+            startStatus.add(status0);
+            parcel.setDeliveryStatus(startStatus);
+            packageRepository.save(parcel);
+        }
     }
 
     private void generatePlan(Parcel parcel) {
@@ -51,6 +72,7 @@ public class CreatePackages implements Runnable {
         PlannedPoint p0 = new PlannedPoint();
         p0.setDeliveryPoint(startPoint.get());
         p0.setPointNumber(1);
+        p0.setParcel(parcel);
         PlannedPoint p1 = new PlannedPoint();
         p1.setDeliveryPoint(endPoint.get());
         routePlan.add(p0);
@@ -69,13 +91,15 @@ public class CreatePackages implements Runnable {
                 PlannedPoint p = new PlannedPoint();
                 p.setPointNumber(pointNum + 1);
                 p.setDeliveryPoint(deliveryPoint.get());
+                p.setParcel(parcel);
                 routePlan.add(p);
                 break;
             }
         }
         routePlan.add(p1);
         p1.setPointNumber(routePlan.size());
-      parcel.setRoutePlan(routePlan);
+        p1.setParcel(parcel);
+        parcel.setRoutePlan(routePlan);
     }
 
 }

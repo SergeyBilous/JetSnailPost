@@ -13,9 +13,11 @@ public class PlannedPoint implements Comparable<PlannedPoint> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "planned_routes_generator")
     @Column(name = "ID")
     private Long id;
-    @ManyToOne
-    @Cascade(value={org.hibernate.annotations.CascadeType.ALL})
-    @JoinColumn(name="PACKAGE_REF")
+
+
+
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinColumn(name="PACKAGE_REF",referencedColumnName = "ID")
     private Parcel parcel;
     @Column(name = "POINT_NUMBER")
     private Integer pointNumber;
@@ -56,5 +58,12 @@ public class PlannedPoint implements Comparable<PlannedPoint> {
 
     public void setDeliveryPoint(DeliveryPoint deliveryPoint) {
         this.deliveryPoint = deliveryPoint;
+    }
+    public Parcel getParcel() {
+        return parcel;
+    }
+
+    public void setParcel(Parcel parcel) {
+        this.parcel = parcel;
     }
 }

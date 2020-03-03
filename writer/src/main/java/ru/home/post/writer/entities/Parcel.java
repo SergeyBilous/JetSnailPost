@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
@@ -27,17 +28,10 @@ public class Parcel {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "END_POINT")
     private DeliveryPoint endPoint;
-
-    public List<PlannedPoint> getRoutePlan() {
-        return routePlan;
-    }
-
-    public void setRoutePlan(List<PlannedPoint> routePlan) {
-        this.routePlan = routePlan;
-    }
-
-    @OneToMany(mappedBy = "parcel")
-    private List<PlannedPoint> routePlan;
+    @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Collection<PlannedPoint> routePlan;
+    @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL)
+    private Collection<DeliveryStatus> deliveryStatus;
 
     public Parcel() {
     }
@@ -74,6 +68,13 @@ public class Parcel {
         this.endPoint = endPoint;
     }
 
+    public Collection<DeliveryStatus> getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(Collection<DeliveryStatus> deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -86,6 +87,14 @@ public class Parcel {
         return new EqualsBuilder()
                 .append(id, parcel.id)
                 .isEquals();
+    }
+
+    public Collection<PlannedPoint> getRoutePlan() {
+        return routePlan;
+    }
+
+    public void setRoutePlan(Collection<PlannedPoint> routePlan) {
+        this.routePlan = routePlan;
     }
 
     @Override
