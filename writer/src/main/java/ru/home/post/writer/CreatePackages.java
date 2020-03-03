@@ -6,6 +6,7 @@ import ru.home.post.writer.config.Commons;
 import ru.home.post.writer.entities.*;
 import ru.home.post.writer.repositories.DeliveryPointRepository;
 import ru.home.post.writer.repositories.PackageRepository;
+import ru.home.post.writer.repositories.StatusesRepository;
 import ru.home.post.writer.repositories.TimeSettingsRepository;
 
 import java.util.ArrayList;
@@ -23,34 +24,48 @@ public class CreatePackages implements Runnable {
     @Autowired
     private TimeSettingsRepository timeSettingsRepository;
     @Autowired
+    private StatusesRepository statusesRepository;
+
+    @Autowired
     Environment environment;
 
-private String sPackagesPerDay;
+
     public CreatePackages(Integer days) {
         this.days = days;
     }
 
     @Override
     public void run() {
-
-        sPackagesPerDay=environment.getProperty("newpackages.per.day");
+        String sPackagesPerDay;
+        String sPackagesDelta;
+        sPackagesPerDay = environment.getProperty("newpackages.per.day");
+        sPackagesDelta = environment.getProperty("newpackages.delta");
+        int packagesPerDay = Integer.valueOf(sPackagesPerDay);
+        int packagesDelta = Integer.valueOf(sPackagesDelta);
         Optional<TimeSettings> timeSettings = timeSettingsRepository.findById(1L);
         timeSettings.get().setDate(new Date());
         timeSettings.get().setIterationNumber(0L);
         timeSettingsRepository.save(timeSettings.get());
+        Date operationDate;
         for (int iterationNumber = 0; iterationNumber < days; iterationNumber++) {
-            Parcel parcel = new Parcel();
-            parcel.setAcceptanceDate(new Date());
-            generatePlan(parcel);
-            List<DeliveryStatus> startStatus = new ArrayList<>();
-            DeliveryStatus status0 = new DeliveryStatus();
-            status0.setOperationDate(new Date());
-            status0.setStatus(new Statuses());
-            status0.getStatus().setId(ParcelStatus.ACCEPTED.label);
-            status0.setDeliveryPoint(parcel.getStartPoint());
-            startStatus.add(status0);
-            parcel.setDeliveryStatus(startStatus);
-            packageRepository.save(parcel);
+            int packages = Commons.getRandom(packagesPerDay - (packagesPerDay / 100 * packagesDelta), packagesPerDay
+                    + (packagesPerDay / 100 * packagesDelta));
+            operationDate = Commons.addDays(timeSettings.get().getDate(), iterationNumber);
+            for (int packageNum = 0; packageNum < packages; packageNum++) {
+                Parcel parcel = new Parcel();
+                parcel.setAcceptanceDate(operationDate);
+                generatePlan(parcel);
+                List<DeliveryStatus> startStatus = new ArrayList<>();
+                DeliveryStatus status0 = new DeliveryStatus();
+                status0.setOperationDate(operationDate);
+                Optional<Statuses> acceptedStatus=statusesRepository.findById(ParcelStatus.ACCEPTED.label);
+                status0.setStatus(acceptedStatus.get());
+                startStatus.add(status0);
+                parcel.setDeliveryStatus(startStatus);
+                packageRepository.save(parcel);
+                System.out.println("Saved "+operationDate+"\t"+parcel.getId()+"\t"+new Date());
+            }
+            timeSettings.get().setIterationNumber(Long.valueOf(iterationNumber));
         }
     }
 
