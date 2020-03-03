@@ -20,7 +20,7 @@ import java.util.Properties;
 
 @Configuration
 @PropertySource("classpath:application.properties")
-@EnableJpaRepositories(basePackages = {"ru.home.post.writer.repository"})
+@EnableJpaRepositories(basePackages = {"ru.home.post.writer.repositories"})
 public class DataConfig {
     @Autowired
     private Environment env;

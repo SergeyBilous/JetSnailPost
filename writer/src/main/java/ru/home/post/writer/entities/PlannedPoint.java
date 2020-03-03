@@ -16,7 +16,8 @@ public class PlannedPoint implements Comparable<PlannedPoint>{
     private Parcel parcel;
     @Column(name = "POINT_NUMBER")
     private Integer pointNumber;
-    @Column(name = "DELIVERY_POINT")
+   @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "DELIVERY_POINT")
     private DeliveryPoint deliveryPoint;
 
     @Override
