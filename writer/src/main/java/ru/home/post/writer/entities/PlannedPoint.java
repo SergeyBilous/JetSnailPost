@@ -1,5 +1,7 @@
 package ru.home.post.writer.entities;
 
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 
@@ -11,14 +13,16 @@ public class PlannedPoint implements Comparable<PlannedPoint> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "planned_routes_generator")
     @Column(name = "ID")
     private Long id;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "PACKAGE_REF")
+    @ManyToOne
+    @Cascade(value={org.hibernate.annotations.CascadeType.ALL})
+    @JoinColumn(name="PACKAGE_REF")
     private Parcel parcel;
     @Column(name = "POINT_NUMBER")
     private Integer pointNumber;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "DELIVERY_POINT")
+    @JoinColumn(name = "POINT_REF")
     private DeliveryPoint deliveryPoint;
+
 
     public PlannedPoint() {
     }
@@ -37,13 +41,6 @@ public class PlannedPoint implements Comparable<PlannedPoint> {
         this.id = id;
     }
 
-    public Parcel getParcel() {
-        return parcel;
-    }
-
-    public void setParcel(Parcel parcel) {
-        this.parcel = parcel;
-    }
 
     public Integer getPointNumber() {
         return pointNumber;

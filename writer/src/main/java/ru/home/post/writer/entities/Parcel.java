@@ -2,6 +2,7 @@ package ru.home.post.writer.entities;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,17 +17,26 @@ public class Parcel {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "packages_generator")
     @Column(name = "ID")
     private Long id;
+
     @Column(name = "ACCEPTANCE_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date acceptanceDate;
-    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "START_POINT")
     private DeliveryPoint startPoint;
-    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "END_POINT")
     private DeliveryPoint endPoint;
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JoinColumn(name = "PACKAGE_REF")
+
+    public List<PlannedPoint> getRoutePlan() {
+        return routePlan;
+    }
+
+    public void setRoutePlan(List<PlannedPoint> routePlan) {
+        this.routePlan = routePlan;
+    }
+
+    @OneToMany(mappedBy = "parcel")
     private List<PlannedPoint> routePlan;
 
     public Parcel() {
@@ -64,13 +74,6 @@ public class Parcel {
         this.endPoint = endPoint;
     }
 
-    public List<PlannedPoint> getRoutePlan() {
-        return routePlan;
-    }
-
-    public void setRoutePlan(List<PlannedPoint> routePlan) {
-        this.routePlan = routePlan;
-    }
 
     @Override
     public boolean equals(Object o) {

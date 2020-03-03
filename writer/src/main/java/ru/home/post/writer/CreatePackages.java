@@ -75,7 +75,7 @@ public class CreatePackages implements Runnable {
         }
         routePlan.add(p1);
         p1.setPointNumber(routePlan.size());
-        parcel.setRoutePlan(routePlan);
+      parcel.setRoutePlan(routePlan);
     }
 
 }
