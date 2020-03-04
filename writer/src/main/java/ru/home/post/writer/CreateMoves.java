@@ -4,11 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import ru.home.post.writer.*;
 import ru.home.post.writer.config.Commons;
-import ru.home.post.writer.entities.CurrentDeliveryStatus;
-import ru.home.post.writer.entities.Parcel;
-import ru.home.post.writer.entities.ParcelStatus;
-import ru.home.post.writer.entities.TimeSettings;
+import ru.home.post.writer.entities.*;
 import ru.home.post.writer.repositories.CurrentDeliveryStatusRepository;
+import ru.home.post.writer.repositories.PackageRepository;
+import ru.home.post.writer.repositories.StatusesRepository;
 import ru.home.post.writer.repositories.TimeSettingsRepository;
 
 
@@ -26,6 +25,10 @@ public class CreateMoves implements Runnable {
     private TimeSettingsRepository timeSettingsRepository;
     @Autowired
     private CurrentDeliveryStatusRepository currentDeliveryStatusRepository;
+    @Autowired
+    private StatusesRepository statusesRepository;
+    @Autowired
+    private PackageRepository packageRepository;
 
     public CreateMoves(Integer days) {
 
@@ -77,7 +80,20 @@ public class CreateMoves implements Runnable {
                 updatedStatuses.add(cs);
                 break;
             }
-            Parcel parcel=cs.getParcel();
+            Parcel parcel = cs.getParcel();
+            DeliveryPoint nextPoint = Commons.getNextPoint(parcel);
+            DeliveryStatus ds = new DeliveryStatus();
+            ds.setOperationDate(currentDate);
+            ds.setDeliveryPoint(nextPoint);
+            ds.setParcel(parcel);
+            ds.setStatus(getStatusById(ParcelStatus.EN_ROUTE.label));
+            parcel.getDeliveryStatus().add(ds);
+            packageRepository.save(parcel);
         }
+    }
+
+    private Statuses getStatusById(Long id) {
+        Optional<Statuses> st = statusesRepository.findById(id);
+        return st.get();
     }
 }

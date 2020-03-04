@@ -1,11 +1,9 @@
 package ru.home.post.writer.config;
 
-import ru.home.post.writer.entities.DeliveryPoint;
-import ru.home.post.writer.entities.DeliveryStatus;
-import ru.home.post.writer.entities.Parcel;
-import ru.home.post.writer.entities.ParcelStatus;
+import ru.home.post.writer.entities.*;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Random;
 
@@ -20,36 +18,58 @@ public class Commons {
     public static Integer getDeliveryPointsQuantity() {
         return deliveryPointsQuantity;
     }
-    public static int getRandom(int min,int max){
+
+    public static int getRandom(int min, int max) {
         return random.nextInt((max - min) + 1) + min;
     }
-    public static Date addDays(Date date,int days){
-        Calendar c=Calendar.getInstance();
+
+    public static Date addDays(Date date, int days) {
+        Calendar c = Calendar.getInstance();
         c.setTime(date);
-        c.add(Calendar.DATE,days);
+        c.add(Calendar.DATE, days);
         return c.getTime();
     }
-    public static DeliveryPoint getNextPoint(Parcel parcel){
-        DeliveryPoint deliveryPoint=null;
-        DeliveryStatus currentStatus=null;
-        Date currentDate=null;
-        for(DeliveryStatus ds : parcel.getDeliveryStatus()){
-            if(currentDate==null){
-                currentDate=ds.getOperationDate();
-                currentStatus=ds;
-            }else{
-                if(currentDate.compareTo(ds.getOperationDate())>0){
-                    currentDate=ds.getOperationDate();
-                    currentStatus=ds;
+
+    public static DeliveryPoint getNextPoint(Parcel parcel) {
+        DeliveryPoint deliveryPoint = null;
+        DeliveryStatus currentStatus = null;
+        Date currentDate = null;
+        for (DeliveryStatus ds : parcel.getDeliveryStatus()) {
+            if (currentDate == null) {
+                currentDate = ds.getOperationDate();
+                currentStatus = ds;
+            } else {
+                if (currentDate.compareTo(ds.getOperationDate()) > 0) {
+                    currentDate = ds.getOperationDate();
+                    currentStatus = ds;
                 }
             }
         }
-        DeliveryPoint currentPoint=currentStatus.getDeliveryPoint();
-        if(currentStatus.getStatus().getId().equals(ParcelStatus.ACCEPTED.label)){
-            deliveryPoint=currentPoint;
+        DeliveryPoint currentPoint = currentStatus.getDeliveryPoint();
+        if (currentStatus.getStatus().getId().equals(ParcelStatus.ACCEPTED.label) ||
+                currentStatus.getStatus().getId().equals(ParcelStatus.WAITING_FOR_TRANSPORT.label)) {
+            deliveryPoint = currentPoint;
+        } else {
+            // Ищем текущую точку в плане, по ее номеру находим следующую
+            Collection<PlannedPoint> plannedPoints = parcel.getRoutePlan();
+            PlannedPoint plannedPoint = null;
+            for (PlannedPoint p : plannedPoints) {
+                if (p.getDeliveryPoint().getId().equals(currentPoint.getId())) {
+                    plannedPoint = p;
+                    break;
+                }
+            }
+            Integer pointNumber = plannedPoint.getPointNumber();
+            for (PlannedPoint p : plannedPoints) {
+                if (p.getPointNumber().equals(pointNumber + 1)) {
+                    deliveryPoint = p.getDeliveryPoint();
+                    break;
+                }
+            }
         }
         return deliveryPoint;
     }
+
 
 
 }
