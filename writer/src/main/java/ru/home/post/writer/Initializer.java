@@ -5,13 +5,16 @@ import ru.home.post.writer.config.CarrierInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class Initializer {
-    private CarrierInfo carrierInfo;
+    private static CarrierInfo carrierInfo;
 
     public Initializer() {
     }
@@ -20,7 +23,7 @@ public class Initializer {
         this.carrierInfo = carrierInfo;
     }
 
-    public Boolean truncateTables() {
+    public static Boolean truncateTables() {
         String[] tablesToTruncate = {"DELIVERY_POINTS", "DELIVERY_STATUS", "PACKAGES", "PLANNED_ROUTES",
                 "STATUSES", "TIMESETTINGS"};
         try (Statement st = carrierInfo.getConnection().createStatement()) {
@@ -43,7 +46,7 @@ public class Initializer {
 
     }
 
-    public Boolean loadData(String tableName, File contentFile) {
+    public static Boolean loadData(String tableName, File contentFile) {
         String query = "insert into " + carrierInfo.getUser() + "." + tableName + " values(?,?)";
         try (Scanner sc = new Scanner(contentFile);
              PreparedStatement st = carrierInfo.getConnection().prepareStatement(query)) {
@@ -61,8 +64,34 @@ public class Initializer {
         return true;
     }
 
-    public static void main(String[] args) {
-        CarrierInfo carrierInfo = new CarrierInfo("hadoop.home.ru", "logistic1", "CARRIER", "welcome1");
+    public static void main(String[] args) throws IOException {
+        if(args.length==0){
+            System.out.println("Nothing to do");
+            return;
+        }
+        if(args[0].equalsIgnoreCase("ALL")){
+            System.out.println("Clear all data, are you shure(Y/N, defaul N)?");
+            try(Scanner keybScanner=new Scanner(System.in)){
+                String response=keybScanner.nextLine();
+                if(!response.toUpperCase().startsWith("Y"))
+                    return;
+                clearAll();
+            }
+        }else{
+            if(args[0].equalsIgnoreCase("MOVES")){
+                clearMoves();
+            }
+        }
+        Properties prop=new Properties();
+        String propFileName="application.properties";
+        InputStream inputStream=Initializer.class.getClassLoader().getResourceAsStream(propFileName);
+        prop.load(inputStream);
+        CarrierInfo carrierInfo = new CarrierInfo(prop.getProperty("spring.datasource.url"),
+                 prop.getProperty("spring.datasource.username"),
+                prop.getProperty("spring.datasource.password"));
+
+    }
+    public static void clearAll(){
         Initializer initializer = new Initializer(carrierInfo);
         ClassLoader classLoader = initializer.getClass().getClassLoader();
 
@@ -72,6 +101,12 @@ public class Initializer {
                 return;
             File statusFile = new File(classLoader.getResource("statuses.csv").getFile());
             initializer.loadData("STATUSES", statusFile);
+        }
+    }
+    public static void clearMoves(){
+        String query="delete from "+carrierInfo.getUser()+".DELIVERY_STATUS where 1=1";
+        try(Statement st=carrierInfo.getConnection().createStatement()){} catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

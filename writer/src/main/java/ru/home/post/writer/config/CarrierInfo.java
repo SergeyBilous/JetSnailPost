@@ -16,14 +16,14 @@ public class CarrierInfo {
         return user;
     }
 
-    public CarrierInfo(String host, String dbName, String user, String password) {
+    public CarrierInfo(String url,  String user, String password) {
         this.host = host;
         this.dbName = dbName;
         this.user = user;
         this.password = password;
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            connection= DriverManager.getConnection("jdbc:oracle:thin:@"+host+":1521:"+dbName,user,password);
+            connection= DriverManager.getConnection(url,user,password);
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

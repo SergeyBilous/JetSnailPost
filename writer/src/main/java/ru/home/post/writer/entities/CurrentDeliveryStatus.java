@@ -4,17 +4,15 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "DELIVERY_STATUS", schema = "carrier")
-public class DeliveryStatus {
+@Table(name="")
+public class CurrentDeliveryStatus {
     @Id
-    @SequenceGenerator(name = "delivery_status_generator", sequenceName = "DELIVERY_STATUS_SEQ", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "delivery_status_generator")
-    @Column(name = "ID")
+    @Column(name="ID")
     private Long id;
     @Column(name="OPERATION_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date operationDate;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PACKAGE_REF", referencedColumnName = "ID")
     private Parcel parcel;
     @ManyToOne(fetch = FetchType.EAGER)
@@ -23,10 +21,7 @@ public class DeliveryStatus {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "STATUS_REF", referencedColumnName = "ID")
     private Statuses status;
-
-    public DeliveryStatus() {
-
-    }
+public CurrentDeliveryStatus(){}
 
     public Long getId() {
         return id;
