@@ -3,6 +3,8 @@ package ru.home.post.writer.entities;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -28,8 +30,10 @@ public class Parcel {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "END_POINT")
     private DeliveryPoint endPoint;
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Collection<PlannedPoint> routePlan;
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL)
     private Collection<DeliveryStatus> deliveryStatus;
 

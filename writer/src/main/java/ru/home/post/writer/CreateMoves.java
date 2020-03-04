@@ -60,8 +60,8 @@ public class CreateMoves implements Runnable {
                 accepted.add(cs);
             }
         }
-        int moves = Commons.getRandom(movesPerDay - movesDelta / movesPerDay * 100,
-                movesPerDay + movesDelta / movesPerDay * 100);
+        int moves = Commons.getRandom(movesPerDay - (movesDelta*100) / movesPerDay ,
+                movesPerDay + (movesDelta*100) / movesPerDay );
         int maxMoves = moves >= accepted.size() ? moves : accepted.size();
         for (int i = 0; i < maxMoves; i++) {
             CurrentDeliveryStatus cs;
