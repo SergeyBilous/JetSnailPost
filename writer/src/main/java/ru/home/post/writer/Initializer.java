@@ -82,16 +82,11 @@ public class Initializer {
                 clearMoves();
             }
         }
-        Properties prop=new Properties();
-        String propFileName="application.properties";
-        InputStream inputStream=Initializer.class.getClassLoader().getResourceAsStream(propFileName);
-        prop.load(inputStream);
-        CarrierInfo carrierInfo = new CarrierInfo(prop.getProperty("spring.datasource.url"),
-                 prop.getProperty("spring.datasource.username"),
-                prop.getProperty("spring.datasource.password"));
+
 
     }
-    public static void clearAll(){
+    public static void clearAll() throws IOException {
+        connect();
         Initializer initializer = new Initializer(carrierInfo);
         ClassLoader classLoader = initializer.getClass().getClassLoader();
 
@@ -103,10 +98,22 @@ public class Initializer {
             initializer.loadData("STATUSES", statusFile);
         }
     }
-    public static void clearMoves(){
-        String query="delete from "+carrierInfo.getUser()+".DELIVERY_STATUS where 1=1";
-        try(Statement st=carrierInfo.getConnection().createStatement()){} catch (SQLException e) {
+    public static void clearMoves() throws IOException {
+        connect();
+        String query="delete from "+carrierInfo.getUser()+".DELIVERY_STATUS where status_ref>1";
+        try(Statement st=carrierInfo.getConnection().createStatement()){
+            st.executeUpdate(query);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public static void connect() throws IOException {
+        Properties prop=new Properties();
+        String propFileName="application.properties";
+        InputStream inputStream=Initializer.class.getClassLoader().getResourceAsStream(propFileName);
+        prop.load(inputStream);
+        carrierInfo = new CarrierInfo(prop.getProperty("spring.datasource.url"),
+                prop.getProperty("spring.datasource.username"),
+                prop.getProperty("spring.datasource.password"));
     }
 }

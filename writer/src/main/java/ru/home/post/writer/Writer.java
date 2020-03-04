@@ -21,7 +21,7 @@ public class Writer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        CreatePackages parcelCreator = new CreatePackages(30);
+        CreatePackages parcelCreator = new CreatePackages(25);
         applicationContext.getAutowireCapableBeanFactory().autowireBean(parcelCreator);
         Thread parcelCreatorThread = new Thread(parcelCreator);
         parcelCreatorThread.start();
