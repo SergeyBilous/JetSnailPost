@@ -62,8 +62,7 @@ public class CreateMoves implements Runnable {
         }
         int moves = Commons.getRandom(movesPerDay - (movesDelta*100) / movesPerDay ,
                 movesPerDay + (movesDelta*100) / movesPerDay );
-        int maxMoves = moves >= accepted.size() ? moves : accepted.size();
-        for (int i = 0; i < maxMoves; i++) {
+        for (int i = 0; i < moves; i++) {
             CurrentDeliveryStatus cs;
             int attempts = 0;
             while (true) {
@@ -88,6 +87,7 @@ public class CreateMoves implements Runnable {
             ds.setParcel(parcel);
             ds.setStatus(getStatusById(ParcelStatus.EN_ROUTE.label));
             parcel.getDeliveryStatus().add(ds);
+            System.out.println("Accepted->en route : "+currentDate+" "+parcel.getId()+" "+new Date());
             packageRepository.save(parcel);
         }
     }

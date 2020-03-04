@@ -14,16 +14,17 @@ import java.util.Properties;
 import java.util.Scanner;
 
 public class Initializer {
-    private static CarrierInfo carrierInfo;
+    private  CarrierInfo carrierInfo;
 
-    public Initializer() {
+    public Initializer() throws IOException {
+        connect();
     }
 
     public Initializer(CarrierInfo carrierInfo) {
         this.carrierInfo = carrierInfo;
     }
 
-    public static Boolean truncateTables() {
+    public  Boolean truncateTables() {
         String[] tablesToTruncate = {"DELIVERY_POINTS", "DELIVERY_STATUS", "PACKAGES", "PLANNED_ROUTES",
                 "STATUSES", "TIMESETTINGS"};
         try (Statement st = carrierInfo.getConnection().createStatement()) {
@@ -46,7 +47,7 @@ public class Initializer {
 
     }
 
-    public static Boolean loadData(String tableName, File contentFile) {
+    public  Boolean loadData(String tableName, File contentFile) {
         String query = "insert into " + carrierInfo.getUser() + "." + tableName + " values(?,?)";
         try (Scanner sc = new Scanner(contentFile);
              PreparedStatement st = carrierInfo.getConnection().prepareStatement(query)) {
@@ -65,7 +66,7 @@ public class Initializer {
     }
 
 
-    public static void clearAll() throws IOException {
+    public  void clearAll() throws IOException {
         connect();
         Initializer initializer = new Initializer(carrierInfo);
         ClassLoader classLoader = initializer.getClass().getClassLoader();
@@ -78,7 +79,7 @@ public class Initializer {
             initializer.loadData("STATUSES", statusFile);
         }
     }
-    public static void clearMoves() throws IOException {
+    public  void clearMoves() throws IOException {
         connect();
         String query="delete from "+carrierInfo.getUser()+".DELIVERY_STATUS where status_ref>1";
         try(Statement st=carrierInfo.getConnection().createStatement()){
@@ -87,7 +88,7 @@ public class Initializer {
             e.printStackTrace();
         }
     }
-    public static void connect() throws IOException {
+    public  void connect() throws IOException {
         Properties prop=new Properties();
         String propFileName="application.properties";
         InputStream inputStream=Initializer.class.getClassLoader().getResourceAsStream(propFileName);
