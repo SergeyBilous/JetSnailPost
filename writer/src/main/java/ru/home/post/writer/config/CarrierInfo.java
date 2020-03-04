@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class CarrierInfo {
-    private String host,dbName,user,password;
+    private String user;
     Connection connection;
 
     public Connection getConnection() {
@@ -17,10 +17,8 @@ public class CarrierInfo {
     }
 
     public CarrierInfo(String url,  String user, String password) {
-        this.host = host;
-        this.dbName = dbName;
+
         this.user = user;
-        this.password = password;
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             connection= DriverManager.getConnection(url,user,password);

@@ -64,27 +64,7 @@ public class Initializer {
         return true;
     }
 
-    public static void main(String[] args) throws IOException {
-        if(args.length==0){
-            System.out.println("Nothing to do");
-            return;
-        }
-        if(args[0].equalsIgnoreCase("ALL")){
-            System.out.println("Clear all data, are you shure(Y/N, defaul N)?");
-            try(Scanner keybScanner=new Scanner(System.in)){
-                String response=keybScanner.nextLine();
-                if(!response.toUpperCase().startsWith("Y"))
-                    return;
-                clearAll();
-            }
-        }else{
-            if(args[0].equalsIgnoreCase("MOVES")){
-                clearMoves();
-            }
-        }
 
-
-    }
     public static void clearAll() throws IOException {
         connect();
         Initializer initializer = new Initializer(carrierInfo);

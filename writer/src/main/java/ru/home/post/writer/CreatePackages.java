@@ -65,7 +65,7 @@ public class CreatePackages implements Runnable {
                 status0.setDeliveryPoint(parcel.getStartPoint());
                 parcel.setDeliveryStatus(startStatus);
                 packageRepository.save(parcel);
-                System.out.println("Saved "+operationDate+"\t"+parcel.getId()+"\t"+new Date());
+                System.out.println("Saved "+operationDate+"\t"+parcel.getId()+"\t"+new Date()+"--");
             }
             timeSettings.get().setIterationNumber(Long.valueOf(iterationNumber));
         }
