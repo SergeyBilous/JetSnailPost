@@ -19,7 +19,7 @@ public class DeliveryStatus {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "POINT_REF")
     private DeliveryPoint deliveryPoint;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "STATUS_REF", referencedColumnName = "ID")
     private Statuses status;
 

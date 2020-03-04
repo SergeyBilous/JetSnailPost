@@ -61,6 +61,8 @@ public class CreatePackages implements Runnable {
                 Optional<Statuses> acceptedStatus=statusesRepository.findById(ParcelStatus.ACCEPTED.label);
                 status0.setStatus(acceptedStatus.get());
                 startStatus.add(status0);
+                status0.setParcel(parcel);
+                status0.setDeliveryPoint(parcel.getStartPoint());
                 parcel.setDeliveryStatus(startStatus);
                 packageRepository.save(parcel);
                 System.out.println("Saved "+operationDate+"\t"+parcel.getId()+"\t"+new Date());
