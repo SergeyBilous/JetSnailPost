@@ -47,53 +47,68 @@ public class CreateMoves implements Runnable {
             updatedStatuses = new HashSet<>();
             Date currentDate = Commons.addDays(startDate, iterationNumber);
             Iterable<CurrentDeliveryStatus> currentStatus = currentDeliveryStatusRepository.findAll();
-            sendAccepted(currentStatus, currentDate);
+            createMoves(currentStatus, currentDate,ParcelStatus.ACCEPTED);
+            createMoves(currentStatus, currentDate,ParcelStatus.EN_ROUTE);
+            createMoves(currentStatus,currentDate,ParcelStatus.WAITING_FOR_TRANSPORT);
         }
     }
 
-    private void sendAccepted(Iterable<CurrentDeliveryStatus> currentStatus, Date currentDate) {
+
+    private Statuses getStatusById(Long id) {
+        Optional<Statuses> st = statusesRepository.findById(id);
+        return st.get();
+    }
+
+    private List<CurrentDeliveryStatus> getStatusByParcelsStatus(Iterable<CurrentDeliveryStatus> currentStatus, Date currentDate, ParcelStatus status) {
         List<CurrentDeliveryStatus> accepted = new ArrayList<>();
         Iterator it = currentStatus.iterator();
         while (it.hasNext()) {
             CurrentDeliveryStatus cs = (CurrentDeliveryStatus) it.next();
-            if (cs.getOperationDate().compareTo(currentDate) > 0) {
+            if (cs.getOperationDate().compareTo(currentDate) < 0 &&
+                    cs.getStatus().getId().equals(status.label)) {
                 accepted.add(cs);
             }
         }
-        int moves = Commons.getRandom(movesPerDay - (movesDelta*100) / movesPerDay ,
-                movesPerDay + (movesDelta*100) / movesPerDay );
-        for (int i = 0; i < moves; i++) {
-            CurrentDeliveryStatus cs;
-            int attempts = 0;
-            while (true) {
-                int idx = Commons.getRandom(0, accepted.size() - 1);
-                cs = accepted.get(idx);
-                if (updatedStatuses.contains(cs)) {
-                    attempts++;
-                    if (attempts > 25) {
-                        System.out.println("Cant find element");
-                        System.exit(0);
-                    }
-                    continue;
-                }
-                updatedStatuses.add(cs);
-                break;
-            }
+        return accepted;
+    }
+
+    private void createMoves(Iterable<CurrentDeliveryStatus> currentStatus, Date currentDate,
+                             ParcelStatus fromStatus) {
+        List<CurrentDeliveryStatus> parcelsToMove = getStatusByParcelsStatus(currentStatus, currentDate, fromStatus);
+        if (parcelsToMove.size() == 0)
+            return;
+        int moves = Commons.getRandom(movesPerDay - (movesDelta * 100) / movesPerDay,
+                movesPerDay + (movesDelta * 100) / movesPerDay);
+        Iterator<Integer> it = Commons.randomIterator(moves, 0, parcelsToMove.size() - 1);
+        while (it.hasNext()) {
+            Integer idx = it.next();
+            CurrentDeliveryStatus cs = parcelsToMove.get(idx);
             Parcel parcel = cs.getParcel();
             DeliveryPoint nextPoint = Commons.getNextPoint(parcel);
             DeliveryStatus ds = new DeliveryStatus();
             ds.setOperationDate(currentDate);
             ds.setDeliveryPoint(nextPoint);
             ds.setParcel(parcel);
-            ds.setStatus(getStatusById(ParcelStatus.EN_ROUTE.label));
             parcel.getDeliveryStatus().add(ds);
-            System.out.println("Accepted->en route : "+currentDate+" "+parcel.getId()+" "+new Date());
+            switch (fromStatus) {
+                case ACCEPTED: {
+                    ds.setStatus(getStatusById(ParcelStatus.EN_ROUTE.label));
+                    break;
+                }
+                case EN_ROUTE: {
+                    if(nextPoint.equals(parcel.getEndPoint()))
+                        ds.setStatus(getStatusById(ParcelStatus.READY_FOR_DELIVERY.label));
+                    else
+                        ds.setStatus(getStatusById(ParcelStatus.WAITING_FOR_TRANSPORT.label));
+                    break;
+
+                }
+                case WAITING_FOR_TRANSPORT:
+                    ds.setStatus(getStatusById(ParcelStatus.EN_ROUTE.label));
+            }
+            System.out.println(currentDate+"\t"+parcel.getId()+"\t"+fromStatus+"\t"+ ParcelStatus.valueOfLabel(ds.getStatus().getId())+
+                    "\t"+new Date() );
             packageRepository.save(parcel);
         }
-    }
-
-    private Statuses getStatusById(Long id) {
-        Optional<Statuses> st = statusesRepository.findById(id);
-        return st.get();
     }
 }

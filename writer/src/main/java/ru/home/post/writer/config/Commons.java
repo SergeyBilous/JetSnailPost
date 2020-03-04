@@ -2,10 +2,7 @@ package ru.home.post.writer.config;
 
 import ru.home.post.writer.entities.*;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 public class Commons {
     private static Integer deliveryPointsQuantity = 42;
@@ -70,6 +67,18 @@ public class Commons {
         return deliveryPoint;
     }
 
-
+    public static Iterator<Integer> randomIterator(int quantity, int min, int max) {
+        ArrayList<Integer> response = new ArrayList<>();
+        for (int i = 0; i < quantity; i++) {
+            while (true) {
+                Integer next = getRandom(min, max);
+                if (!response.contains(next)) {
+                    response.add(next);
+                    break;
+                }
+            }
+        }
+        return response.iterator();
+    }
 
 }
