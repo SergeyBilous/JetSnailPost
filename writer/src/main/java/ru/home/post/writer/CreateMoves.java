@@ -5,6 +5,7 @@ import org.springframework.core.env.Environment;
 import ru.home.post.writer.*;
 import ru.home.post.writer.config.Commons;
 import ru.home.post.writer.entities.CurrentDeliveryStatus;
+import ru.home.post.writer.entities.ParcelStatus;
 import ru.home.post.writer.entities.TimeSettings;
 import ru.home.post.writer.repositories.CurrentDeliveryStatusRepository;
 import ru.home.post.writer.repositories.TimeSettingsRepository;
@@ -14,6 +15,10 @@ import java.util.*;
 
 public class CreateMoves implements Runnable {
     private Integer days;
+    private Set<CurrentDeliveryStatus> updatedStatuses;
+    private Date startDate;
+    private int movesPerDay;
+    private int movesDelta;
     @Autowired
     private Environment environment;
     @Autowired
@@ -28,17 +33,30 @@ public class CreateMoves implements Runnable {
 
     @Override
     public void run() {
-        String sMovesPerDay=environment.getProperty("moves.per.day");
-        String sMovesDelta=environment.getProperty("moves.delta");
-        int movesPerDay=Integer.valueOf(sMovesPerDay);
-        int movesDelta=Integer.valueOf(sMovesDelta);
+        String sMovesPerDay = environment.getProperty("moves.per.day");
+        String sMovesDelta = environment.getProperty("moves.delta");
+        movesPerDay = Integer.valueOf(sMovesPerDay);
+        movesDelta = Integer.valueOf(sMovesDelta);
         Optional<TimeSettings> timeSettings = timeSettingsRepository.findById(1L);
-        Date startDate=timeSettings.get().getDate();
-        Iterable<CurrentDeliveryStatus> currentStatus=currentDeliveryStatusRepository.findAll();
-        for(int iterationNumber=1;iterationNumber<days;iterationNumber++){
-            Date currentDate= Commons.addDays(startDate,iterationNumber);
-            int moves=Commons.getRandom(movesPerDay-movesDelta/movesPerDay*100,
-                    movesPerDay+movesDelta/movesPerDay*100);
+        startDate = timeSettings.get().getDate();
+        for (int iterationNumber = 1; iterationNumber < days; iterationNumber++) {
+            updatedStatuses = new HashSet<>();
+            Date currentDate = Commons.addDays(startDate, iterationNumber);
+            Iterable<CurrentDeliveryStatus> currentStatus = currentDeliveryStatusRepository.findAll();
+            sendAccepted(currentStatus, currentDate);
         }
+    }
+
+    private void sendAccepted(Iterable<CurrentDeliveryStatus> currentStatus, Date currentDate) {
+        List<CurrentDeliveryStatus> accepted = new ArrayList<>();
+        Iterator it = currentStatus.iterator();
+        while (it.hasNext()) {
+            CurrentDeliveryStatus cs = (CurrentDeliveryStatus) it.next();
+            if (cs.getOperationDate().compareTo(currentDate) < 0) {
+                accepted.add(cs);
+            }
+        }
+        int moves = Commons.getRandom(movesPerDay - movesDelta / movesPerDay * 100,
+                movesPerDay + movesDelta / movesPerDay * 100);
     }
 }

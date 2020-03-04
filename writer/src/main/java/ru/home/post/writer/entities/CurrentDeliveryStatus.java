@@ -1,10 +1,13 @@
 package ru.home.post.writer.entities;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name="")
+@Table(name="CURRENT_DELIVERY_STATUS",schema="CARRIER")
 public class CurrentDeliveryStatus {
     @Id
     @Column(name="ID")
@@ -61,5 +64,25 @@ public CurrentDeliveryStatus(){}
 
     public void setStatus(Statuses status) {
         this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CurrentDeliveryStatus that = (CurrentDeliveryStatus) o;
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .toHashCode();
     }
 }

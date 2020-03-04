@@ -15,11 +15,16 @@ import org.springframework.context.annotation.ComponentScan;
 public class Mover implements CommandLineRunner {
     @Autowired
     private ApplicationContext applicationContext;
-    public static void main(String[] args){
-        SpringApplication.run(Mover.class,args);
+
+    public static void main(String[] args) {
+        SpringApplication.run(Mover.class, args);
     }
+
     @Override
     public void run(String... args) throws Exception {
-
+        CreateMoves movesCreator = new CreateMoves(25);
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(movesCreator);
+        Thread movesCreatorThread=new Thread(movesCreator);
+        movesCreatorThread.start();
     }
 }
