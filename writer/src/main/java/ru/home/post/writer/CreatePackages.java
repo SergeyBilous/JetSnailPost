@@ -28,7 +28,7 @@ public class CreatePackages implements Runnable {
 
     @Autowired
     Environment environment;
-
+    private Integer routeLength;
 
     public CreatePackages(Integer days) {
         this.days = days;
@@ -36,6 +36,7 @@ public class CreatePackages implements Runnable {
 
     @Override
     public void run() {
+        routeLength = Integer.valueOf(environment.getProperty("route.length"));
         String sPackagesPerDay;
         String sPackagesDelta;
         sPackagesPerDay = environment.getProperty("newpackages.per.day");
@@ -58,14 +59,14 @@ public class CreatePackages implements Runnable {
                 List<DeliveryStatus> startStatus = new ArrayList<>();
                 DeliveryStatus status0 = new DeliveryStatus();
                 status0.setOperationDate(operationDate);
-                Optional<Statuses> acceptedStatus=statusesRepository.findById(ParcelStatus.ACCEPTED.label);
+                Optional<Statuses> acceptedStatus = statusesRepository.findById(ParcelStatus.ACCEPTED.label);
                 status0.setStatus(acceptedStatus.get());
                 startStatus.add(status0);
                 status0.setParcel(parcel);
                 status0.setDeliveryPoint(parcel.getStartPoint());
                 parcel.setDeliveryStatus(startStatus);
                 packageRepository.save(parcel);
-                System.out.println("Saved "+operationDate+"\t"+parcel.getId()+"\t"+new Date()+"--");
+                System.out.println("Saved " + operationDate + "\t" + parcel.getId() + "\t" + new Date() + "--");
             }
             timeSettings.get().setIterationNumber(Long.valueOf(iterationNumber));
         }
@@ -94,11 +95,11 @@ public class CreatePackages implements Runnable {
         p1.setDeliveryPoint(endPoint.get());
         routePlan.add(p0);
 
-        int numOfPoints = Commons.getRandom(1, 10);
+        int numOfPoints = Commons.getRandom(1, routeLength);
         for (int pointNum = 1; pointNum <= numOfPoints; pointNum++) {
             Optional<DeliveryPoint> deliveryPoint;
             while (true) {
-                Long pointId = Long.valueOf(Commons.getRandom(1, 42));
+                Long pointId = Long.valueOf(Commons.getRandom(1, Commons.getDeliveryPointsQuantity()));
                 deliveryPoint = deliveryPointRepository.findById(pointId);
                 Long id = deliveryPoint.get().getId();
                 List<PlannedPoint> pointAddedPreviously = routePlan.stream().
