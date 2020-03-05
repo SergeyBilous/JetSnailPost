@@ -70,13 +70,21 @@ public class Commons {
     public static Iterator<Integer> randomIterator(int quantity, int min, int max) {
         ArrayList<Integer> response = new ArrayList<>();
         for (int i = 0; i < quantity; i++) {
+            int attempts=0;
+            int maxAttempts=25;
             while (true) {
                 Integer next = getRandom(min, max);
                 if (!response.contains(next)) {
                     response.add(next);
                     break;
+                }else{
+                    attempts++;
+                    if(attempts==maxAttempts)
+                        break;
                 }
             }
+            if(attempts==maxAttempts)
+                break;
         }
         return response.iterator();
     }
